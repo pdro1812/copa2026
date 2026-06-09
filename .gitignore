@@ -145,3 +145,8 @@ cython_debug/
 
 # Output files
 selecoes_ids.csv
+
+# Docker e ambientes locais
+.config/
+/db_data/
+.docker-tasklog
