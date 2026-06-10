@@ -14,3 +14,13 @@ CREATE TABLE IF NOT EXISTS selecoes (
     sigla VARCHAR(3) NOT NULL,
     bandeira_url VARCHAR(255)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS jogadores (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    selecao_id INT NOT NULL,
+    nome VARCHAR(100) NOT NULL,
+    posicao VARCHAR(50),
+    foto_url VARCHAR(255),
+    codigo_figurinha VARCHAR(10) NOT NULL UNIQUE,
+    FOREIGN KEY (selecao_id) REFERENCES selecoes(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
