@@ -1,15 +1,18 @@
 <?php
 
+ob_start();
 session_start();
 
 require_once '../app/Controllers/AuthController.php';
 require_once '../app/Controllers/ImportController.php';
+require_once '../app/Controllers/PacotinhoController.php';
 
 $url = isset($_GET['url']) ? $_GET['url'] : 'home';
 $url = rtrim($url, '/');
 
 $auth = new AuthController();
 $import = new ImportController();
+$pacotinho = new PacotinhoController();
 
 switch ($url) {
     case 'home':
@@ -25,6 +28,7 @@ switch ($url) {
                         
                         <div class="d-grid gap-3 d-sm-flex justify-content-sm-center">
                             <a href="index.php?url=album" class="btn btn-primary btn-lg px-4">Meu Álbum</a>
+                            <a href="index.php?url=abrir_pacote" class="btn btn-success btn-lg px-4">Abrir Pacotinho</a>
                             <a href="index.php?url=sync_fifa" class="btn btn-outline-warning btn-lg px-4">Sincronizar FIFA</a>
                         </div>
                     </div>
@@ -36,6 +40,14 @@ switch ($url) {
         
     case 'sync_fifa':
         $import->syncFifa();
+        break;
+
+    case 'abrir_pacote':
+        $pacotinho->index();
+        break;
+
+    case 'processar_pacote':
+        $pacotinho->open();
         break;
         
     case 'login':

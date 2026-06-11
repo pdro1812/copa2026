@@ -15,17 +15,15 @@ class ImportController {
         $file = fopen($csvPath, 'r');
         fgetcsv($file); // Pula cabeçalho
 
-        // Carrega o layout inicial com a view de log
         $view = '../app/Views/sync_fifa.php';
         require __DIR__ . '/../Views/layout.php';
 
-        // Script para inserir no log via JS (hack para streaming em PHP nativo com Bootstrap)
-        echo "<script>const log = document.getElementById('sync-log'); log.innerHTML = '';</script>";
+        while (ob_get_level() > 0) ob_end_flush();
+        flush();
+
+        echo "<script>var logContainer = document.getElementById('sync-log');</script>";
 
         set_time_limit(0);
-        ob_implicit_flush(true);
-        while (ob_get_level()) ob_end_clean();
-
         while (($row = fgetcsv($file)) !== FALSE) {
             $teamId = $row[0];
             $nomeSugestao = $row[1];
@@ -46,33 +44,53 @@ class ImportController {
 
             if ($httpCode === 200) {
                 $dados = json_decode($response, true);
+                
                 if (isset($dados['TeamName'][0]['Description'])) {
                     $nomePais = $dados['TeamName'][0]['Description'];
                     $sigla = strtoupper(substr(preg_replace('/[^A-Za-z0-9]/', '', $nomePais), 0, 3));
                     $selecaoId = $album->saveSelecao($nomePais, $sigla);
 
-                    echo "<script>log.innerHTML += '<p class=\"text-info mb-1\"><strong>Sincronizando: {$nomePais} ({$sigla})</strong></p>';</script>";
+                    echo "<script>if(logContainer) logContainer.innerHTML += '<p class=\"text-info mb-1\"><strong>🌍 Sincronizando: " . addslashes($nomePais) . " ({$sigla})</strong></p>';</script>";
+                    flush();
 
-                    if (isset($dados['Squad'])) {
+                    // Conforme novo JSON: A chave correta é 'Players' e não 'Squad'
+                    $players = $dados['Players'] ?? $dados['Squad'] ?? null;
+
+                    if ($players && is_array($players)) {
                         $count = 1;
-                        foreach ($dados['Squad'] as $player) {
+                        foreach ($players as $player) {
                             $nomePlayer = addslashes($player['PlayerName'][0]['Description'] ?? 'Desconhecido');
-                            $posicao = $player['Position'] ?? 'N/A';
+                            
+                            // Posição localizada conforme exemplo
+                            $posicao = $player['PositionLocalized'][0]['Description'] ?? null;
+                            if (!$posicao && isset($player['Position'])) {
+                                $mapPos = [0 => 'Goleiro', 1 => 'Defensor', 2 => 'Meio-campista', 3 => 'Atacante'];
+                                $posicao = $mapPos[$player['Position']] ?? 'Jogador';
+                            }
+
+                            // Foto URL se disponível
+                            $fotoUrl = $player['PlayerPicture']['PictureUrl'] ?? '';
+
                             $codigo = $sigla . '-' . str_pad($count, 2, '0', STR_PAD_LEFT);
                             
-                            $album->saveJogador($selecaoId, $nomePlayer, $posicao, '', $codigo);
-                            echo "<script>log.innerHTML += '<div class=\"ps-3 text-secondary\" style=\"font-size: 0.8em\"> ⚽ {$codigo} - {$nomePlayer}</div>';</script>";
+                            $album->saveJogador($selecaoId, $nomePlayer, $posicao, $fotoUrl, $codigo);
+                            echo "<script>if(logContainer) logContainer.innerHTML += '<div class=\"ps-3 text-secondary\" style=\"font-size: 0.8em\"> ⚽ {$codigo} - {$nomePlayer} ({$posicao})</div>';</script>";
+                            flush();
                             $count++;
                         }
+                    } else {
+                        echo "<script>if(logContainer) logContainer.innerHTML += '<p class=\"text-warning ms-3\">⚠️ Nenhum jogador encontrado (Chave Players/Squad ausente).</p>';</script>";
                     }
                 }
             } else {
-                echo "<script>log.innerHTML += '<p class=\"text-danger\">Erro ID {$teamId}. HTTP: {$httpCode}</p>';</script>";
+                echo "<script>if(logContainer) logContainer.innerHTML += '<p class=\"text-danger\">❌ Erro no ID {$teamId}. HTTP: {$httpCode}</p>';</script>";
+                flush();
             }
-            usleep(500000); 
+            usleep(600000); 
         }
 
-        echo "<script>document.getElementById('sync-status').innerHTML = '<span class=\"text-success\">Sincronização concluída com sucesso!</span>';</script>";
+        echo "<script>document.getElementById('sync-status').innerHTML = '<span class=\"text-success\">✅ Sincronização concluída com sucesso!</span>';</script>";
+        flush();
         fclose($file);
     }
 }

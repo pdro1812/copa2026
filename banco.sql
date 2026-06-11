@@ -24,3 +24,12 @@ CREATE TABLE IF NOT EXISTS jogadores (
     codigo_figurinha VARCHAR(10) NOT NULL UNIQUE,
     FOREIGN KEY (selecao_id) REFERENCES selecoes(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS usuario_figurinhas (
+    usuario_id INT NOT NULL,
+    jogador_id INT NOT NULL,
+    quantidade INT DEFAULT 1,
+    PRIMARY KEY (usuario_id, jogador_id),
+    FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE,
+    FOREIGN KEY (jogador_id) REFERENCES jogadores(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

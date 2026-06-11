@@ -43,4 +43,29 @@ class Album {
     public function getAllSelecoes() {
         return $this->db->query("SELECT * FROM selecoes ORDER BY nome")->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    public function drawRandomJogadores($limit = 5) {
+        $stmt = $this->db->query("SELECT j.id, j.nome, j.posicao, j.foto_url, j.codigo_figurinha, s.nome as selecao_nome, s.sigla 
+                                  FROM jogadores j 
+                                  JOIN selecoes s ON j.selecao_id = s.id 
+                                  ORDER BY RAND() LIMIT $limit");
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function addFigurinhaToUsuario($usuarioId, $jogadorId) {
+        // Verifica se já tem
+        $stmt = $this->db->prepare("SELECT quantidade FROM usuario_figurinhas WHERE usuario_id = :uid AND jogador_id = :jid");
+        $stmt->execute([':uid' => $usuarioId, ':jid' => $jogadorId]);
+        $res = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($res) {
+            // Incrementa
+            $stmt = $this->db->prepare("UPDATE usuario_figurinhas SET quantidade = quantidade + 1 WHERE usuario_id = :uid AND jogador_id = :jid");
+            return $stmt->execute([':uid' => $usuarioId, ':jid' => $jogadorId]);
+        } else {
+            // Insere novo
+            $stmt = $this->db->prepare("INSERT INTO usuario_figurinhas (usuario_id, jogador_id, quantidade) VALUES (:uid, :jid, 1)");
+            return $stmt->execute([':uid' => $usuarioId, ':jid' => $jogadorId]);
+        }
+    }
 }
