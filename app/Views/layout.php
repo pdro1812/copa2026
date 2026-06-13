@@ -6,6 +6,8 @@
     <title>Álbum Copa 2026</title>
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <style>
         body { background-color: #f8f9fa; }
         .navbar { margin-bottom: 30px; }
@@ -23,6 +25,12 @@
             <ul class="navbar-nav me-auto">
                 <li class="nav-item">
                     <a class="nav-link" href="index.php?url=album">Álbum</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="index.php?url=repetidas">Repetidas</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="index.php?url=ranking">Ranking</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="index.php?url=jogos">Jogos</a>

@@ -38,4 +38,17 @@ class AlbumController {
         $view = '../app/Views/detalhes_selecao.php';
         require __DIR__ . '/../Views/layout.php';
     }
+
+    public function repetidas() {
+        if (!isset($_SESSION['usuario_id'])) {
+            header('Location: index.php?url=login');
+            exit;
+        }
+
+        $albumModel = new Album();
+        $jogadores = $albumModel->getRepetidas($_SESSION['usuario_id']);
+
+        $view = '../app/Views/repetidas.php';
+        require __DIR__ . '/../Views/layout.php';
+    }
 }

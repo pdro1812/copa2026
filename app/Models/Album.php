@@ -98,6 +98,19 @@ class Album {
         return $progresso;
     }
 
+    public function getRepetidas($usuarioId) {
+        $stmt = $this->db->prepare("
+            SELECT j.*, s.nome as selecao_nome, s.sigla, s.bandeira_url, uf.quantidade
+            FROM usuario_figurinhas uf
+            JOIN jogadores j ON uf.jogador_id = j.id
+            JOIN selecoes s ON j.selecao_id = s.id
+            WHERE uf.usuario_id = :uid AND uf.quantidade > 1
+            ORDER BY s.nome, j.codigo_figurinha
+        ");
+        $stmt->execute([':uid' => $usuarioId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     public function drawRandomJogadores($limit = 5) {
         $stmt = $this->db->query("SELECT j.id, j.nome, j.posicao, j.foto_url, j.codigo_figurinha, s.nome as selecao_nome, s.sigla 
                                   FROM jogadores j 

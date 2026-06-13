@@ -21,7 +21,7 @@
 
 <div class="text-center py-5">
     <div id="setup-view">
-        <h2 class="mb-4">📦 Pacotinho de Figurinhas</h2>
+        <h2 class="mb-4">Pacotinho de Figurinhas</h2>
         <p class="lead">Você está prestes a abrir um pacote com 5 figurinhas aleatórias!</p>
         <button id="btn-open-pack" class="btn btn-warning btn-lg px-5 shadow">Abrir Meu Pacote!</button>
     </div>

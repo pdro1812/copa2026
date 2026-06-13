@@ -25,4 +25,15 @@ class Usuario {
         $stmt->bindParam(':senha', $hash);
         return $stmt->execute();
     }
+
+    public function getRanking() {
+        // Query para contar figurinhas únicas por usuário
+        $sql = "SELECT u.nome, COUNT(uf.jogador_id) as total_unicas, SUM(uf.quantidade) as total_figurinhas
+                FROM usuarios u
+                LEFT JOIN usuario_figurinhas uf ON u.id = uf.usuario_id
+                GROUP BY u.id
+                ORDER BY total_unicas DESC, total_figurinhas DESC
+                LIMIT 10";
+        return $this->db->query($sql)->fetchAll(PDO::FETCH_ASSOC);
+    }
 }
