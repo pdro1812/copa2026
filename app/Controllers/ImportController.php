@@ -47,10 +47,14 @@ class ImportController {
                 
                 if (isset($dados['TeamName'][0]['Description'])) {
                     $nomePais = $dados['TeamName'][0]['Description'];
-                    $sigla = strtoupper(substr(preg_replace('/[^A-Za-z0-9]/', '', $nomePais), 0, 3));
-                    $selecaoId = $album->saveSelecao($nomePais, $sigla);
+                    // O IdCountry (ex: COD, MEX) é o que a FIFA usa para as bandeiras
+                    $abrevFifa = $dados['IdCountry'] ?? strtoupper(substr(preg_replace('/[^A-Za-z0-9]/', '', $nomePais), 0, 3));
+                    
+                    $bandeiraUrl = "https://api.fifa.com/api/v3/picture/flags-sq-4/{$abrevFifa}";
+                    
+                    $selecaoId = $album->saveSelecao($nomePais, $abrevFifa, $bandeiraUrl);
 
-                    echo "<script>if(logContainer) logContainer.innerHTML += '<p class=\"text-info mb-1\"><strong>🌍 Sincronizando: " . addslashes($nomePais) . " ({$sigla})</strong></p>';</script>";
+                    echo "<script>if(logContainer) logContainer.innerHTML += '<p class=\"text-info mb-1\"><strong>🌍 Sincronizando: " . addslashes($nomePais) . " ({$abrevFifa})</strong></p>';</script>";
                     flush();
 
                     // Conforme novo JSON: A chave correta é 'Players' e não 'Squad'
@@ -71,7 +75,7 @@ class ImportController {
                             // Foto URL se disponível
                             $fotoUrl = $player['PlayerPicture']['PictureUrl'] ?? '';
 
-                            $codigo = $sigla . '-' . str_pad($count, 2, '0', STR_PAD_LEFT);
+                            $codigo = $abrevFifa . '-' . str_pad($count, 2, '0', STR_PAD_LEFT);
                             
                             $album->saveJogador($selecaoId, $nomePlayer, $posicao, $fotoUrl, $codigo);
                             echo "<script>if(logContainer) logContainer.innerHTML += '<div class=\"ps-3 text-secondary\" style=\"font-size: 0.8em\"> ⚽ {$codigo} - {$nomePlayer} ({$posicao})</div>';</script>";

@@ -6,6 +6,7 @@ session_start();
 require_once '../app/Controllers/AuthController.php';
 require_once '../app/Controllers/ImportController.php';
 require_once '../app/Controllers/PacotinhoController.php';
+require_once '../app/Controllers/AlbumController.php';
 
 $url = isset($_GET['url']) ? $_GET['url'] : 'home';
 $url = rtrim($url, '/');
@@ -13,6 +14,7 @@ $url = rtrim($url, '/');
 $auth = new AuthController();
 $import = new ImportController();
 $pacotinho = new PacotinhoController();
+$album = new AlbumController();
 
 switch ($url) {
     case 'home':
@@ -38,6 +40,14 @@ switch ($url) {
         <?php
         break;
         
+    case 'album':
+        $album->index();
+        break;
+
+    case 'album_selecao':
+        $album->verSelecao();
+        break;
+
     case 'sync_fifa':
         $import->syncFifa();
         break;

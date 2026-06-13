@@ -14,7 +14,12 @@ class Album {
         $stmt->execute([':nome' => $nome]);
         $res = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if ($res) return $res['id'];
+        if ($res) {
+            // Se já existe, atualizamos a sigla e a bandeira (caso tenham mudado ou não existissem)
+            $stmt = $this->db->prepare("UPDATE selecoes SET sigla = :sigla, bandeira_url = :bandeira WHERE id = :id");
+            $stmt->execute([':sigla' => $sigla, ':bandeira' => $bandeira_url, ':id' => $res['id']]);
+            return $res['id'];
+        }
 
         $stmt = $this->db->prepare("INSERT INTO selecoes (nome, sigla, bandeira_url) VALUES (:nome, :sigla, :bandeira_url)");
         $stmt->execute([
@@ -42,6 +47,55 @@ class Album {
 
     public function getAllSelecoes() {
         return $this->db->query("SELECT * FROM selecoes ORDER BY nome")->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function getSelecaoById($id) {
+        $stmt = $this->db->prepare("SELECT * FROM selecoes WHERE id = :id");
+        $stmt->execute([':id' => $id]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    public function getJogadoresBySelecao($selecaoId, $usuarioId) {
+        $stmt = $this->db->prepare("
+            SELECT j.*, uf.quantidade 
+            FROM jogadores j 
+            LEFT JOIN usuario_figurinhas uf ON j.id = uf.jogador_id AND uf.usuario_id = :uid
+            WHERE j.selecao_id = :sid
+            ORDER BY j.codigo_figurinha
+        ");
+        $stmt->execute([':sid' => $selecaoId, ':uid' => $usuarioId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function getProgressoUsuario($usuarioId) {
+        $stmt = $this->db->prepare("
+            SELECT 
+                (SELECT COUNT(*) FROM jogadores) as total_album,
+                (SELECT COUNT(*) FROM usuario_figurinhas WHERE usuario_id = :uid) as total_usuario
+        ");
+        $stmt->execute([':uid' => $usuarioId]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    public function getProgressoPorSelecoes($usuarioId) {
+        $stmt = $this->db->prepare("
+            SELECT 
+                s.id,
+                COUNT(j.id) as total_jogadores,
+                COUNT(uf.jogador_id) as total_usuario
+            FROM selecoes s
+            JOIN jogadores j ON s.id = j.selecao_id
+            LEFT JOIN usuario_figurinhas uf ON j.id = uf.jogador_id AND uf.usuario_id = :uid
+            GROUP BY s.id
+        ");
+        $stmt->execute([':uid' => $usuarioId]);
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        $progresso = [];
+        foreach ($rows as $row) {
+            $progresso[$row['id']] = ($row['total_jogadores'] > 0) ? ($row['total_usuario'] / $row['total_jogadores']) * 100 : 0;
+        }
+        return $progresso;
     }
 
     public function drawRandomJogadores($limit = 5) {
