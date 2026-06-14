@@ -2,7 +2,7 @@
     <!-- Hero Section -->
     <div class="col-12 text-center py-5 bg-dark text-white rounded shadow-lg mb-5" style="background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&q=80&w=1200'); background-size: cover; background-position: center;">
         <h1 class="display-3 fw-bold mb-3">Copa do Mundo 2026</h1>
-        <p class="lead mb-4">Complete sua coleção oficial de figurinhas e gerencie os jogos do maior espetáculo da Terra!</p>
+        <p class="lead mb-4">Complete sua coleção oficial de figurinhas do maior espetáculo da Terra!</p>
         
         <?php if (!isset($_SESSION['usuario_id'])): ?>
             <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">

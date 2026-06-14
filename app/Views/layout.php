@@ -32,9 +32,6 @@
                 <li class="nav-item">
                     <a class="nav-link" href="index.php?url=ranking">Ranking</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="index.php?url=jogos">Jogos</a>
-                </li>
             </ul>
             <ul class="navbar-nav ms-auto">
                 <?php if (isset($_SESSION['usuario_id'])): ?>

@@ -69,12 +69,6 @@ switch ($url) {
         $auth->register();
         break;
 
-    case 'album':
-    case 'jogos':
-        // TODO: Implementar nos próximos commits
-        echo "<h1>Em breve...</h1><a href='index.php'>Voltar</a>";
-        break;
-
     default:
         http_response_code(404);
         echo "<h1>404 - Página não encontrada</h1>";
