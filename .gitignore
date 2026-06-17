@@ -149,4 +149,4 @@ selecoes_ids.csv
 # Docker e ambientes locais
 .config/
 /db_data/
-.docker-tasklog
+.docker-tasklog.DS_Store
